@@ -1,0 +1,3 @@
+require('dotenv').config();
+const bcrypt=require('bcryptjs');const {pool}=require('./db');
+(async()=>{const email=process.env.FOUNDER_EMAIL,password=process.env.FOUNDER_PASSWORD;if(!email||!password||password.length<14)throw new Error('Set FOUNDER_EMAIL dan FOUNDER_PASSWORD (minimal 14 karakter) pada environment.');const hash=await bcrypt.hash(password,12);await pool.query("INSERT INTO users(email,password_hash,role) VALUES($1,$2,'founder') ON CONFLICT(email) DO NOTHING",[email.toLowerCase(),hash]);console.log('Founder account tersedia untuk:',email);await pool.end();})().catch(async e=>{console.error(e);await pool.end();process.exit(1);});
